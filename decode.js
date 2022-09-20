@@ -171,10 +171,10 @@ function Decoder(bytes, port) {
             case s_packet_type_12:
                 obj.packet_type_name = "SP12";
                 break;
-            case a_packet_type_p1:
+            case a_packet_type_1:
                 obj.packet_type_name = "AP1";
                 break;
-            case a_packet_type_p2:
+            case a_packet_type_2:
                 obj.packet_type_name = "AP2";
                 break;
             default:
