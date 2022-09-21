@@ -54,37 +54,37 @@ function Decoder(bytes, port) {
                 break;
             case s_packet_type_2:
                 obj.packet_type_name = "SP2";
-                obj.time_stamp = bytes.slice(1, 5);
-                obj.monthly_value = bytes.slice(5, 9);
-                obj.status_summary = bytes.slice(9, 11);
+                obj.time_stamp = packet.shuft(4);
+                obj.monthly_value = packet.shuft(4);
+                obj.status_summary = packet.shuft(2);
                 obj.time_stamp_hex = as_hex(obj.time_stamp);
                 obj.monthly_value_hex = as_hex(obj.monthly_value);
                 obj.status_summary_hex = as_hex(obj.status_summary);
                 break;
             case s_packet_type_6:
                 obj.packet_type_name = "SP6";
-                obj.date_stamp = bytes.slice(1, 3);
-                obj.monthly_value_channel0 = bytes.slice(3, 7);
-                obj.monthly_value_channel1 = bytes.slice(7, 11);
+                obj.date_stamp = packet.shuft(2);
+                obj.monthly_value_channel0 = packet.shuft(4);
+                obj.monthly_value_channel1 = packet.shuft(4);
                 obj.date_stamp_hex = as_hex(obj.date_stamp);
                 obj.monthly_value_channel0_hex = as_hex(obj.monthly_value_channel0);
                 obj.monthly_value_channel1_hex = as_hex(obj.monthly_value_channel1);
                 break;
             case s_packet_type_3:
                 obj.packet_type_name = "SP3";
-                obj.date_stamp = bytes.slice(1, 5);
-                obj.monthly_value = bytes.slice(5, 9);
-                obj.half_monthly_value = bytes.slice(9, 11);
+                obj.date_stamp = packet.shuft(4);
+                obj.monthly_value = packet.shuft(4);
+                obj.half_monthly_value = packet.shuft(2);
                 obj.date_stamp_hex = as_hex(obj.date_stamp);
                 obj.monthly_value_hex = as_hex(obj.monthly_value);
                 obj.half_monthly_value_hex = as_hex(obj.half_monthly_value);
                 break;
             case s_packet_type_7:
                 obj.packet_type_name = "SP7";
-                obj.monthly_value_channel0 = bytes.slice(1, 5);
-                obj.half_monthly_value_channel0 = bytes.slice(5, 9);
-                obj.monthly_value_channel1 = bytes.slice(9, 13);
-                obj.half_monthly_value_channel1 = bytes.slice(13, 17);
+                obj.monthly_value_channel0 = packet.shuft(4);
+                obj.half_monthly_value_channel0 = packet.shuft(4);
+                obj.monthly_value_channel1 = packet.shuft(4);
+                obj.half_monthly_value_channel1 = packet.shuft(4);
                 obj.monthly_value_channel0_hex = as_hex(obj.monthly_value_channel0);
                 obj.half_monthly_value_channel0_hex = as_hex(obj.half_monthly_value_channel0);
                 obj.monthly_value_channel1_hex = as_hex(obj.monthly_value_channel1);
@@ -92,20 +92,26 @@ function Decoder(bytes, port) {
                 break;
             case s_packet_type_4:
                 obj.packet_type_name = "SP4";
-                obj.date = bytes.slice(1, 3);
-                obj.value = bytes.slice(3, 7);
-                obj.status_summary = bytes.slice(7, 9);
-                obj.reserved = bytes.slice(9, 11);
-                obj.half_monthly_value = bytes.slice(9, 11);
+                obj.date = packet.shuft(2);
+                obj.value = packet.shuft(4);
+                obj.status_summary = packet.shuft(2);
+                obj.reserved = packet.shuft(2);
+                obj.half_monthly_value = packet.shuft(2);
+                // do is da hund drin
+                //obj.date = bytes.slice(1, 3);
+                //obj.value = bytes.slice(3, 7);
+                //obj.status_summary = bytes.slice(7, 9);
+                //obj.reserved = bytes.slice(9, 11);
+                //obj.half_monthly_value = bytes.slice(9, 11);
                 obj.date_stamp_hex = as_hex(obj.date_stamp);
                 obj.monthly_value_hex = as_hex(obj.monthly_value);
                 obj.half_monthly_value_hex = as_hex(obj.half_monthly_value);
                 break;
             case s_packet_type_8:
                 obj.packet_type_name = "SP8";
-                obj.date = bytes.slice(1, 3);
-                obj.value_channel0 = bytes.slice(3, 7);
-                obj.value_channel1 = bytes.slice(7, 11);
+                obj.date = packet.shuft(2);
+                obj.value_channel0 = packet.shuft(4);
+                obj.value_channel1 = packet.shuft(4);
                 break;
             case s_packet_type_9:
                 obj.packet_type_name = "SP9";
