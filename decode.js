@@ -139,6 +139,7 @@ function Decoder(bytes, port) {
                         obj.time_stamp_hex = as_hex(obj.time_stamp);
                         obj.time_stamp = date_time_format(obj.time_stamp);
                         obj.status_summary_hex = as_hex(obj.status_summary);
+                        obj.status_summary = sp91_status_summary(obj.status_summary);
                         obj.reserved_hex = as_hex(obj.reserved);
                     break;
                     case packet_subtype_2:
@@ -291,6 +292,25 @@ function date_format(cp16) {
     return year.toString() + "-" + month + "-" + day;
 }
 
+function sp91_status_summary(byteArray) {
+    var summary_values = {
+        0b00000001: "removal",
+        0b00000010: "n/a",
+        0b00000100: "battery end of life",
+        0b00001000: "acoustic alarm failure",
+        0b00010000: "obstruction detection",
+        0b00100000: "surrounding area monitoring",
+    }
+    let status_summary = byteArray[1] << 8 | byteArray[0];
+    let status_summary_txt = [];
+    for([key, val] of Object.entries(summary_values)) {
+        if (status_summary & key) {
+            status_summary_txt.push(val);
+        }
+    }
+    return status_summary_txt.join(", ");
+}
+
 function sp1_day_value(byteArray) {
     // https://iot-shop.de/web/image/44371?unique=7238472b6f1804cf6e1c39b3d9fc1d1a32005305
 //console.log("sp1_day_value byteArray is ",typeof byteArray);
@@ -317,18 +337,76 @@ function sp1_day_value(byteArray) {
     return day_status_txt.join(", ");
 }
 
-function ap1_status(code, data) {
+function ap1_status(status_code, byteArray) {
     var status_codes = {
         0x01: "tamper",
         0x02: "removal",
+        0x03: "leak",
+        0x04: "reverse flow",
+        0x05: "battery warning",
+        0x06: "oversized",
+        0x07: "undersized",
+        0x08: "error",
+        0x09: "1F mode",
+        0x0A: "blockage",
+        0x0B: "burst",
+        0x0C: "battery EOL",
+        0x0D: "reserved",
+        0x0E: "reserved",
+        0x0F: "reserved",
+        0x10: "battery prewarning",
+        0x11: "reserved",
+        0x12: "reserved",
+        0x13: "smoke chamber pollution forewarning",
+        0x14: "smoke chamber pollution warning",
+        0x15: "push button failure",
+        0x16: "horn drive level",
+        0x17: "reserved",
+        0x18: "test alarm released",
+        0x19: "smoke alarm released",
+        0x1A: "ingress apertures obstruction detection",
+        0x1B: "LED failure",
+        0x1C: "object in the sorrounding area detected",
     };
-    var text = "";
-    switch (code) {
+    var explanation = "";
+    var status_data = "";
+    if (status_code in status_codes) {
+        explanation = status_codes[status_code];
+    } else {
+        explanation = "reserved";
+    }
+    switch (status_code) {
+        case 0x01:
+            // byte0: bit0 = 0 = started, bit0 = 1 = ended
+            if (data & 0b000000010000000000000000) {
+                status_data = "ended "+date_format(byteArray.slice(1, 3));
+            } else {
+                status_data = "started "+date_format(byteArray.slice(1, 3));
+            }
         case 0x02:
-            text = date_format(data.slice(1, 3));
+            status_data = date_format(byteArray.slice(1, 3));
+            break;
+        case 0x03:
+        case 0x04:
+        case 0x06:
+        case 0x07:
+        case 0x0A:
+        case 0x0B:
+            let channel = byteArray[0] & 0xFF;
+            status_data = "channel"+channel.toString()+" "+date_format(byteArray.slice(1, 3));
+            break;
+        case 0x05:
+        case 0x0C:
+        case 0x10:
+            let voltage = (0b0000000011111111 & byteArray[1]) | ((0b0000000011111111 & byteArray[2]) << 8);
+            status_data = "voltage "+voltage.toString()+"mV";
+            break;
+        case 0x08:
+            let error = (0b0000000011111111 & byteArray[1]) | ((0b0000000011111111 & byteArray[2]) << 8);
+            status_data = "errorcode "+error.toString();
             break;
     }
-    return [status_codes[code], text];
+    return [explanation, status_data];
 }
 
 function Lorapacket(bytes) {
