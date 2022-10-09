@@ -3,7 +3,11 @@ EQCAAAA=
 EQEAAAA=
 EQGAAAA=
 EQgAAAA=
+oAIA3Sg=
+kRoh2SkgAEoANAA=
 oAIAxCk=
 oAIAyik=
-
+khwAFAICAAEgAAj/////AAA=
+oAIAxyo=
+EQkAAAA=
 for i in $(seq 20); do from=$(printf "2022-09-%02dT00:00:00Z" $i); to=$(printf "2022-09-%02dT00:00:00Z" $(($i + 1))); logcli query --quiet --output raw --from "$from" --to "$to" '{job="mqtt_logger",mqtt_topic=~"helium/cwb-smoke.*/rx"} | json | line_format "{{.name}} {{.payload}}"'; done| awk '{print $2}' | sort -u
