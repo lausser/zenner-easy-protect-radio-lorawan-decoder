@@ -1,4 +1,6 @@
 function Decoder(bytes, port) {
+    let debug = false;
+    if (process.env.DEBUG == "1") debug = true;
     var obj = {};
     obj.decoder = "https://github.com/lausser/zenner-easy-protect-radio-lorawan-decoder";
     obj.port = port;
@@ -34,14 +36,14 @@ function Decoder(bytes, port) {
                 obj.packet_type_name = "SP0";
                 obj.current_value = packet.shuft(4);
                 obj.debug_data = packet.shuft(10);
-                obj.current_value_hex = as_hex(obj.current_value);
-                obj.debug_data_hex = as_hex(obj.debug_data);
+                if (debug) obj.current_value_hex = as_hex(obj.current_value);
+                if (debug) obj.debug_data_hex = as_hex(obj.debug_data);
                 break;
             case s_packet_type_1:
                 // daily
                 obj.packet_type_name = "SP1";
                 obj.day_value = packet.shuft(4);
-                obj.day_value_hex = as_hex(obj.day_value);
+                if (debug) obj.day_value_hex = as_hex(obj.day_value);
                 obj.day_value = sp1_day_value(obj.day_value);
                 break;
             case s_packet_type_5:
@@ -49,36 +51,36 @@ function Decoder(bytes, port) {
                 obj.day_value_channel0 = packet.shuft(4);
                 obj.day_value_channel1 = packet.shuft(4);
                 obj.status_summary = packet.shuft(2);
-                obj.day_value_channel0_hex = as_hex(obj.day_value_channel0);
-                obj.day_value_channel1_hex = as_hex(obj.day_value_channel1);
-                obj.status_summary_hex = as_hex(obj.status_summary);
+                if (debug) obj.day_value_channel0_hex = as_hex(obj.day_value_channel0);
+                if (debug) obj.day_value_channel1_hex = as_hex(obj.day_value_channel1);
+                if (debug) obj.status_summary_hex = as_hex(obj.status_summary);
                 break;
             case s_packet_type_2:
                 obj.packet_type_name = "SP2";
                 obj.time_stamp = packet.shuft(4);
                 obj.monthly_value = packet.shuft(4);
                 obj.status_summary = packet.shuft(2);
-                obj.time_stamp_hex = as_hex(obj.time_stamp);
-                obj.monthly_value_hex = as_hex(obj.monthly_value);
-                obj.status_summary_hex = as_hex(obj.status_summary);
+                if (debug) obj.time_stamp_hex = as_hex(obj.time_stamp);
+                if (debug) obj.monthly_value_hex = as_hex(obj.monthly_value);
+                if (debug) obj.status_summary_hex = as_hex(obj.status_summary);
                 break;
             case s_packet_type_6:
                 obj.packet_type_name = "SP6";
                 obj.date_stamp = packet.shuft(2);
                 obj.monthly_value_channel0 = packet.shuft(4);
                 obj.monthly_value_channel1 = packet.shuft(4);
-                obj.date_stamp_hex = as_hex(obj.date_stamp);
-                obj.monthly_value_channel0_hex = as_hex(obj.monthly_value_channel0);
-                obj.monthly_value_channel1_hex = as_hex(obj.monthly_value_channel1);
+                if (debug) obj.date_stamp_hex = as_hex(obj.date_stamp);
+                if (debug) obj.monthly_value_channel0_hex = as_hex(obj.monthly_value_channel0);
+                if (debug) obj.monthly_value_channel1_hex = as_hex(obj.monthly_value_channel1);
                 break;
             case s_packet_type_3:
                 obj.packet_type_name = "SP3";
                 obj.date_stamp = packet.shuft(4);
                 obj.monthly_value = packet.shuft(4);
                 obj.half_monthly_value = packet.shuft(2);
-                obj.date_stamp_hex = as_hex(obj.date_stamp);
-                obj.monthly_value_hex = as_hex(obj.monthly_value);
-                obj.half_monthly_value_hex = as_hex(obj.half_monthly_value);
+                if (debug) obj.date_stamp_hex = as_hex(obj.date_stamp);
+                if (debug) obj.monthly_value_hex = as_hex(obj.monthly_value);
+                if (debug) obj.half_monthly_value_hex = as_hex(obj.half_monthly_value);
                 break;
             case s_packet_type_7:
                 obj.packet_type_name = "SP7";
@@ -86,10 +88,10 @@ function Decoder(bytes, port) {
                 obj.half_monthly_value_channel0 = packet.shuft(4);
                 obj.monthly_value_channel1 = packet.shuft(4);
                 obj.half_monthly_value_channel1 = packet.shuft(4);
-                obj.monthly_value_channel0_hex = as_hex(obj.monthly_value_channel0);
-                obj.half_monthly_value_channel0_hex = as_hex(obj.half_monthly_value_channel0);
-                obj.monthly_value_channel1_hex = as_hex(obj.monthly_value_channel1);
-                obj.half_monthly_value_channel1_hex = as_hex(obj.half_monthly_value_channel1);
+                if (debug) obj.monthly_value_channel0_hex = as_hex(obj.monthly_value_channel0);
+                if (debug) obj.half_monthly_value_channel0_hex = as_hex(obj.half_monthly_value_channel0);
+                if (debug) obj.monthly_value_channel1_hex = as_hex(obj.monthly_value_channel1);
+                if (debug) obj.half_monthly_value_channel1_hex = as_hex(obj.half_monthly_value_channel1);
                 break;
             case s_packet_type_4:
                 obj.packet_type_name = "SP4";
@@ -104,9 +106,9 @@ function Decoder(bytes, port) {
                 //obj.status_summary = bytes.slice(7, 9);
                 //obj.reserved = bytes.slice(9, 11);
                 //obj.half_monthly_value = bytes.slice(9, 11);
-                obj.date_stamp_hex = as_hex(obj.date_stamp);
-                obj.monthly_value_hex = as_hex(obj.monthly_value);
-                obj.half_monthly_value_hex = as_hex(obj.half_monthly_value);
+                if (debug) obj.date_stamp_hex = as_hex(obj.date_stamp);
+                if (debug) obj.monthly_value_hex = as_hex(obj.monthly_value);
+                if (debug) obj.half_monthly_value_hex = as_hex(obj.half_monthly_value);
                 break;
             case s_packet_type_8:
                 obj.packet_type_name = "SP8";
@@ -126,7 +128,7 @@ function Decoder(bytes, port) {
                         //  and eventually resynchronize it using a CP packet
                         obj.packet_subtype_name = "ST0";
                         obj.time_stamp = packet.shuft(4);
-                        obj.time_stamp_hex = as_hex(obj.time_stamp);
+                        if (debug) obj.time_stamp_hex = as_hex(obj.time_stamp);
 // alte conversion aufrufen, eingabetypen vergleichen
                     break;
                     case packet_subtype_1:
@@ -135,12 +137,12 @@ function Decoder(bytes, port) {
                         obj.packet_subtype_name = "ST1";
                         obj.time_stamp = packet.shuft(4);
                         obj.status_summary = packet.shuft(2);
-                        obj.reserved = packet.shuft(4);
-                        obj.time_stamp_hex = as_hex(obj.time_stamp);
+                        if (debug) obj.reserved = packet.shuft(4);
+                        if (debug) obj.time_stamp_hex = as_hex(obj.time_stamp);
                         obj.time_stamp = date_time_format(obj.time_stamp);
-                        obj.status_summary_hex = as_hex(obj.status_summary);
+                        if (debug) obj.status_summary_hex = as_hex(obj.status_summary);
                         obj.status_summary = sp91_status_summary(obj.status_summary);
-                        obj.reserved_hex = as_hex(obj.reserved);
+                        if (debug) obj.reserved_hex = as_hex(obj.reserved);
                     break;
                     case packet_subtype_2:
                         // Sent immediately after first
@@ -184,8 +186,8 @@ function Decoder(bytes, port) {
                 obj.status_code = packet.shuft(1)
                 obj.status_data = packet.shuft(3)
                 //obj.overhead = packet.shuft(13)
-                obj.status_code_hex = as_hex(obj.status_code);
-                obj.status_data_hex = as_hex(obj.status_data);
+                if (debug) obj.status_code_hex = as_hex(obj.status_code);
+                if (debug) obj.status_data_hex = as_hex(obj.status_data);
                 var status = ap1_status(obj.status_code, obj.status_data);
                 obj.status_code = status[0];
                 obj.status_data = status[1];
@@ -222,7 +224,6 @@ function date_time_format(cp32) {
     // YY-MM-DD HH:MM
     // https://iot-shop.de/web/image/45108?unique=f4103674fa25aa001646a02fd7c0aeb30adc7d4b Annex 5.1
     let datebytes = (0b00000000000000000000000011111111 & cp32[0]) | ((0b00000000000000000000000011111111 & cp32[1]) << 8) | ((0b00000000000000000000000011111111 & cp32[2]) << 16) | ((0b00000000000000000000000011111111 & cp32[3]) << 24);
-console.log(datebytes);
     let minute = (0b00000000000000000000000000111111 & datebytes);
     if (minute == 63) {
         minute = "X";
@@ -456,10 +457,10 @@ function main() {
     }
     if (debug) console.log('hex payload: ', readable);
     let obj = Decoder(arr, 1);
-    if (debug)console.log('decoded: ', JSON.stringify(obj, null, 4));
+    if (debug) console.log('decoded: ', JSON.stringify(obj, null, 4));
 }
 
 if (require.main === module) {
   main();
 }
-                     
+
