@@ -1,6 +1,6 @@
 function Decoder(bytes, port) {
     let debug = false;
-    if (parseInt(process.env.DEBUG || "0") > 1) debug = true;
+    if (port == 0) debug = true;
     var obj = {};
     obj.decoder = "https://github.com/lausser/zenner-easy-protect-radio-lorawan-decoder";
     obj.port = port;
@@ -441,6 +441,7 @@ Lorapacket.prototype.shuft = function(number) {
 function main() {
     let debug = false;
     if (parseInt(process.env.DEBUG || 0) > 0) debug = true;
+    let port = (parseInt(process.env.DEBUG || 0) > 1) ? 0 : 1;
     const myArgs = process.argv.slice(2);
     if (debug) console.log('payload: ', myArgs[0]);
     let buff = Buffer.from(myArgs[0], 'base64');
@@ -456,7 +457,7 @@ function main() {
       readable += " "
     }
     if (debug) console.log('hex payload: ', readable);
-    let obj = Decoder(arr, 1);
+    let obj = Decoder(arr, port);
     if (debug) console.log('decoded: ', JSON.stringify(obj, null, 4));
 }
 
