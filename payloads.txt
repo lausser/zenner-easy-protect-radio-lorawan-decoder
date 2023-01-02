@@ -12,6 +12,10 @@ oAIAxyo=
 EQkAAAA=
 oBwA0Co=
 kSohwisgADUAIAA (received 2022-11-02 01:46:03)
-kQkg4SEAADcAIgA= (received 2023-01-01 00:10:37)
+kQkg4SEAADcAIgA= (received 2023-01-01 00:10:37 cwb1)
+kTAg4iEgADoAJAA= (received Jan 2, 2023 12:46:47.640 AM cwb3)
+kSsg4iEgADYAIQA= (received Jan 2, 2023 12:48:06.451 AM cwb4)
+
+
 
 for i in $(seq 20); do from=$(printf "2022-09-%02dT00:00:00Z" $i); to=$(printf "2022-09-%02dT00:00:00Z" $(($i + 1))); logcli query --quiet --output raw --from "$from" --to "$to" '{job="mqtt_logger",mqtt_topic=~"helium/cwb-smoke.*/rx"} | json | line_format "{{.name}} {{.payload}}"'; done| awk '{print $2}' | sort -u
