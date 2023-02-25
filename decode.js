@@ -149,7 +149,7 @@ function Decoder(bytes, port) {
 			// Functional code 8E - shift time
 			// 
 			obj.time_delta_s = Math.round((unixTime - now) / 1000);
-			obj.payload = as_hex(command_timeshift_payload(obj.time_delta_s));
+			obj.corrective_payload = as_hex(command_timeshift_payload(obj.time_delta_s));
                     break;
                     case packet_subtype_2:
                         // Sent immediately after first
@@ -418,36 +418,33 @@ function ap1_status(status_code, byteArray) {
 }
 
 function crc16(data) {
-  let crc = 0xffff;
-  for (let i = 0; i < data.length; i++) {
-    crc ^= data[i];
-    for (let j = 0; j < 8; j++) {
-      if (crc & 0x0001) {
-        crc = (crc >>> 1) ^ 0x8005;
-      } else {
-        crc >>>= 1;
-      }
-    }
-  }
-  return crc;
+ const poly = 0x8005;
+ let crc = 0xffff;
+ for (let i = 0; i < data.length; i++) {
+   crc ^= data[i] << 8;
+   for (let j = 0; j < 8; j++) {
+     crc = crc & 0x8000 ? (crc << 1) ^ poly : crc << 1;
+   }
+ }
+ return crc & 0xffff;
 }
 
 function command_timeshift_payload(offset) {
-	offset = 5400;
+  // example from the manual offset = -5400;
   // Command TimeShift has Function Code 8E
-  // offset 11 = function code = 8E
-  // offset 12, 13 = 
-	// 5400 = 0001 0101 0001 1000
-	//           1    5    1    8
   const payload = []
   payload.push(0x8E);
-  payload.push((offset >>> (1 * 8)) & 0xff);
-  payload.push((offset >>> (0 * 8)) & 0xff);
-  let crc = crc16(payload[0], [payload[1], payload[2]])
-  payload.push((crc >>> (1 * 8)) & 0xff);
+  if (offset < 0) {
+    offset = Math.abs(offset);
+    payload.push((offset >>> (0 * 8)) & 0xff);
+    payload.push((offset >>> (1 * 8)) & 0xff | 0x80);
+  } else {
+    payload.push((offset >>> (0 * 8)) & 0xff);
+    payload.push((offset >>> (1 * 8)) & 0xff);
+  }
+  let crc = crc16([payload[0], payload[1], payload[2]])
   payload.push((crc >>> (0 * 8)) & 0xff);
-  //payload[3] = payload[1];
-  //payload[4] = payload[2];
+  payload.push((crc >>> (1 * 8)) & 0xff);
   // A LoRa packet with the payload 8E1815A654 means:
   // 8E is the command ID
   // 0x1518 = 5400 sec., highest bit = 0 means device will add this to its local time
