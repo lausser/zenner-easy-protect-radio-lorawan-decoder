@@ -143,6 +143,13 @@ function Decoder(bytes, port) {
                         if (debug) obj.status_summary_hex = as_hex(obj.status_summary);
                         obj.status_summary = sp91_status_summary(obj.status_summary);
                         if (debug) obj.reserved_hex = as_hex(obj.reserved);
+			const unixTime = Date.parse(obj.time_stamp);
+			const now = Date.now();
+                        // A negative value means: device time is behind
+			// Functional code 8E - shift time
+			// 
+			obj.time_delta_s = Math.round((unixTime - now) / 1000);
+			obj.payload = as_hex(command_timeshift_payload(obj.time_delta_s));
                     break;
                     case packet_subtype_2:
                         // Sent immediately after first
@@ -408,6 +415,49 @@ function ap1_status(status_code, byteArray) {
             break;
     }
     return [explanation, status_data];
+}
+
+function crc16(data) {
+  let crc = 0xffff;
+  for (let i = 0; i < data.length; i++) {
+    crc ^= data[i];
+    for (let j = 0; j < 8; j++) {
+      if (crc & 0x0001) {
+        crc = (crc >>> 1) ^ 0x8005;
+      } else {
+        crc >>>= 1;
+      }
+    }
+  }
+  return crc;
+}
+
+function command_timeshift_payload(offset) {
+	offset = 5400;
+  // Command TimeShift has Function Code 8E
+  // offset 11 = function code = 8E
+  // offset 12, 13 = 
+	// 5400 = 0001 0101 0001 1000
+	//           1    5    1    8
+  const payload = []
+  payload.push(0x8E);
+  payload.push((offset >>> (1 * 8)) & 0xff);
+  payload.push((offset >>> (0 * 8)) & 0xff);
+  let crc = crc16(payload[0], [payload[1], payload[2]])
+  payload.push((crc >>> (1 * 8)) & 0xff);
+  payload.push((crc >>> (0 * 8)) & 0xff);
+  //payload[3] = payload[1];
+  //payload[4] = payload[2];
+  // A LoRa packet with the payload 8E1815A654 means:
+  // 8E is the command ID
+  // 0x1518 = 5400 sec., highest bit = 0 means device will add this to its local time
+  // 0x54A6 is CRC16, using polynome 0x8005 and start value 0xFFFF
+  // The answer on this packet will just be FE8E as payload (acknowledgement of command reception).
+  // A LoRa packet with the payload 8E1895A5D7 means:
+  // 8E is the command ID
+  // 0x9518 = 5400 sec., highest bit = 1 means device will subtract this from its local time
+  // 0xD7A5 is CRC16, using polynome 0x8005 and start value 0xFFFF
+  return payload;
 }
 
 function Lorapacket(bytes) {
