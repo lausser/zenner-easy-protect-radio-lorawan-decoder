@@ -23,3 +23,14 @@ decoded:  {
     "meter_id": "-1"
 }
 ```
+
+Sending the data through this list of tools....
+* [MQTT integration in Helium Console](https://docs.helium.com/use-the-network/console/integrations/mqtt/)
+* [MQTT](https://mqtt.org/) - i use my own server. You might also use [flespi.io](https://flespi.io), but because of frequent hickups i can not recommend it for a setup where there is just one package per day.
+* [MQTT2Prometheus](https://github.com/hikhvar/mqtt2prometheus)
+* [Prometheus](https://prometheus.io)
+* [Grafana](https://grafana.com/grafana/)
+* [Grafana Plugin Flowcharting](https://github.com/algenty/grafana-flowcharting)
+
+...and in the end there is an image showing how many hours ago a signal from a smoke detector was received.
+![house](/assets/images/zenner-grafana.png)
