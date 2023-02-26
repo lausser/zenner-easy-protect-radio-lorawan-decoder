@@ -485,6 +485,9 @@ Lorapacket.prototype.shuft = function(number) {
     }
 }
 
+// ---snip--snip--snip--snip--snip--snip--snip--snip--snip--snip---
+// This part is for devloping/debugging, do not copy it to the Custom Script
+// text area under My Functions.
 function main() {
     let debug = false;
     if (parseInt(process.env.DEBUG || 0) > 0) debug = true;
