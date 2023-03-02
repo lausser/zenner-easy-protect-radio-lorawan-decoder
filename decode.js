@@ -149,7 +149,8 @@ function Decoder(bytes, port) {
 			// Functional code 8E - shift time
 			// 
 			obj.time_delta_s = Math.round((unixTime - now) / 1000);
-			obj.corrective_payload = as_hex(command_timeshift_payload(obj.time_delta_s));
+			if (debug) obj.corrective_payload_hex = as_hex(command_timeshift_payload(obj.time_delta_s));
+			obj.corrective_payload = as_base64(command_timeshift_payload(obj.time_delta_s));
                     break;
                     case packet_subtype_2:
                         // Sent immediately after first
@@ -221,6 +222,16 @@ function as_hex(bytebuffer) {
     while (len--)
         hexbuf[len] = (intbuf[len] < 16 ? '0' : '') + intbuf[len].toString(16);
     return hexbuf.join(' ');
+}
+
+function as_base64(bytebuffer) {
+    if (typeof bytebuffer[Symbol.iterator] === 'function') {
+        var intbuf = Uint8Array.from(bytebuffer);
+    } else {
+        var intbuf = Uint8Array.from([bytebuffer]);
+    }
+    bu = Buffer.from(intbuf);
+    return bu.toString('base64');
 }
 
 function date_time_format(cp32) {
