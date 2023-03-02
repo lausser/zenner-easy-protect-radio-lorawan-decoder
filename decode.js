@@ -230,8 +230,30 @@ function as_base64(bytebuffer) {
     } else {
         var intbuf = Uint8Array.from([bytebuffer]);
     }
-    bu = Buffer.from(intbuf);
-    return bu.toString('base64');
+    //bu = Buffer.from(intbuf);
+    //return bu.toString('base64');
+    // nodejs of helium does not support the Buffer class
+    const lookup = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".split("");
+    const padding = (intbuf.length % 3) ? 3 - intbuf.length % 3 : 0;
+    let output = "";
+    // Convert each three bytes of the input array to four base64 characters
+    for (let i = 0; i < intbuf.length; i += 3) {
+        const octet1 = intbuf[i];
+        const octet2 = intbuf[i + 1];
+        const octet3 = intbuf[i + 2];
+        const sextet1 = octet1 >> 2;
+        const sextet2 = ((octet1 & 3) << 4) | (octet2 >> 4);
+        const sextet3 = ((octet2 & 15) << 2) | (octet3 >> 6);
+        const sextet4 = octet3 & 63;
+        output += lookup[sextet1];
+        output += lookup[sextet2];
+        output += (i + 1 < intbuf.length) ? lookup[sextet3] : "=";
+        output += (i + 2 < intbuf.length) ? lookup[sextet4] : "=";
+    }
+    // Append padding characters if necessary
+    output = output.slice(0, output.length - padding);
+    output += padding ? "===".slice(padding) : "";
+    return output;
 }
 
 function date_time_format(cp32) {
