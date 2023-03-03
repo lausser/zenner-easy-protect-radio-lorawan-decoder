@@ -4,7 +4,7 @@ function Decoder(bytes, port) {
     var obj = {};
     obj.decoder = "https://github.com/lausser/zenner-easy-protect-radio-lorawan-decoder";
     obj.port = port;
-    if(bytes === null || bytes === 0){
+    if(bytes === null || bytes === 0 || (Array.isArray(bytes) && bytes.length == 0)){
         obj.packet_type_name = "EMPTY";
     } else {
         // Find out if SPx or AP
@@ -25,6 +25,9 @@ function Decoder(bytes, port) {
         const packet_subtype_1 = 0x01;
         const packet_subtype_2 = 0x02;
         const packet_subtype_3 = 0x03;
+        // fe (15/14) is a response to a command
+        const r_packet_type_15 = 0x0f;
+        const packet_subtype_14 = 0x0e;
 
         let packet = new Lorapacket(bytes);
 
@@ -203,12 +206,23 @@ function Decoder(bytes, port) {
             case a_packet_type_2:
                 obj.packet_type_name = "AP2";
                 break;
+            case r_packet_type_15:
+                switch (obj.packet_subtype) {
+                    case packet_subtype_14:
+                        obj.packet_type_name = "ANSWER";
+                        obj.packet_subtype_name = "CMD_"+as_hex(packet.shuft(1));
+                        break;
+                    default:
+                        obj.packet_type_name = "UNIMPLEMENTED";
+                        break;
+                }
+                break;
             default:
                 obj.packet_type_name = "UNIMPLEMENTED";
                 break;
         }
-        return obj;
     }
+    return obj;
 }
 
 function as_hex(bytebuffer) {
