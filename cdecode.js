@@ -1,11 +1,14 @@
 function decodeUplink(input) {
     let debug = false;
     if (input.port == 0) debug = true;
-    var obj = {};
-    obj.decoder = "https://github.com/lausser/zenner-easy-protect-radio-lorawan-decoder";
-    obj.port = input.fPort;
+    var data = {};
+    var obj = {
+      "data": data,
+    };
+    data.decoder = "https://github.com/lausser/zenner-easy-protect-radio-lorawan-decoder";
+    data.port = input.fPort;
     if(input.bytes === null || input.bytes === 0 || (Array.isArray(input.bytes) && input.bytes.length == 0)){
-        obj.packet_type_name = "EMPTY";
+        data.packet_type_name = "EMPTY";
     } else {
         // Find out if SPx or AP
         const s_packet_type_0 = 0x00;
@@ -31,97 +34,97 @@ function decodeUplink(input) {
 
         let packet = new Lorapacket(input.bytes);
 
-        obj.packet_type = packet.shuft(0.5);
-        obj.packet_subtype = packet.shuft(0.5);
+        data.packet_type = packet.shuft(0.5);
+        data.packet_subtype = packet.shuft(0.5);
 
-        switch (obj.packet_type) {
+        switch (data.packet_type) {
             case s_packet_type_0:
-                obj.packet_type_name = "SP0";
-                obj.current_value = packet.shuft(4);
-                obj.debug_data = packet.shuft(10);
-                if (debug) obj.current_value_hex = as_hex(obj.current_value);
-                if (debug) obj.debug_data_hex = as_hex(obj.debug_data);
+                data.packet_type_name = "SP0";
+                data.current_value = packet.shuft(4);
+                data.debug_data = packet.shuft(10);
+                if (debug) data.current_value_hex = as_hex(data.current_value);
+                if (debug) data.debug_data_hex = as_hex(data.debug_data);
                 break;
             case s_packet_type_1:
                 // daily
-                obj.packet_type_name = "SP1";
-                obj.day_value = packet.shuft(4);
-                if (debug) obj.day_value_hex = as_hex(obj.day_value);
-                obj.day_value = sp1_day_value(obj.day_value);
+                data.packet_type_name = "SP1";
+                data.day_value = packet.shuft(4);
+                if (debug) data.day_value_hex = as_hex(data.day_value);
+                data.day_value = sp1_day_value(data.day_value);
                 break;
             case s_packet_type_5:
-                obj.packet_type_name = "SP5";
-                obj.day_value_channel0 = packet.shuft(4);
-                obj.day_value_channel1 = packet.shuft(4);
-                obj.status_summary = packet.shuft(2);
-                if (debug) obj.day_value_channel0_hex = as_hex(obj.day_value_channel0);
-                if (debug) obj.day_value_channel1_hex = as_hex(obj.day_value_channel1);
-                if (debug) obj.status_summary_hex = as_hex(obj.status_summary);
+                data.packet_type_name = "SP5";
+                data.day_value_channel0 = packet.shuft(4);
+                data.day_value_channel1 = packet.shuft(4);
+                data.status_summary = packet.shuft(2);
+                if (debug) data.day_value_channel0_hex = as_hex(data.day_value_channel0);
+                if (debug) data.day_value_channel1_hex = as_hex(data.day_value_channel1);
+                if (debug) data.status_summary_hex = as_hex(data.status_summary);
                 break;
             case s_packet_type_2:
-                obj.packet_type_name = "SP2";
-                obj.time_stamp = packet.shuft(4);
-                obj.monthly_value = packet.shuft(4);
-                obj.status_summary = packet.shuft(2);
-                if (debug) obj.time_stamp_hex = as_hex(obj.time_stamp);
-                if (debug) obj.monthly_value_hex = as_hex(obj.monthly_value);
-                if (debug) obj.status_summary_hex = as_hex(obj.status_summary);
+                data.packet_type_name = "SP2";
+                data.time_stamp = packet.shuft(4);
+                data.monthly_value = packet.shuft(4);
+                data.status_summary = packet.shuft(2);
+                if (debug) data.time_stamp_hex = as_hex(data.time_stamp);
+                if (debug) data.monthly_value_hex = as_hex(data.monthly_value);
+                if (debug) data.status_summary_hex = as_hex(data.status_summary);
                 break;
             case s_packet_type_6:
-                obj.packet_type_name = "SP6";
-                obj.date_stamp = packet.shuft(2);
-                obj.monthly_value_channel0 = packet.shuft(4);
-                obj.monthly_value_channel1 = packet.shuft(4);
-                if (debug) obj.date_stamp_hex = as_hex(obj.date_stamp);
-                if (debug) obj.monthly_value_channel0_hex = as_hex(obj.monthly_value_channel0);
-                if (debug) obj.monthly_value_channel1_hex = as_hex(obj.monthly_value_channel1);
+                data.packet_type_name = "SP6";
+                data.date_stamp = packet.shuft(2);
+                data.monthly_value_channel0 = packet.shuft(4);
+                data.monthly_value_channel1 = packet.shuft(4);
+                if (debug) data.date_stamp_hex = as_hex(data.date_stamp);
+                if (debug) data.monthly_value_channel0_hex = as_hex(data.monthly_value_channel0);
+                if (debug) data.monthly_value_channel1_hex = as_hex(data.monthly_value_channel1);
                 break;
             case s_packet_type_3:
-                obj.packet_type_name = "SP3";
-                obj.date_stamp = packet.shuft(4);
-                obj.monthly_value = packet.shuft(4);
-                obj.half_monthly_value = packet.shuft(2);
-                if (debug) obj.date_stamp_hex = as_hex(obj.date_stamp);
-                if (debug) obj.monthly_value_hex = as_hex(obj.monthly_value);
-                if (debug) obj.half_monthly_value_hex = as_hex(obj.half_monthly_value);
+                data.packet_type_name = "SP3";
+                data.date_stamp = packet.shuft(4);
+                data.monthly_value = packet.shuft(4);
+                data.half_monthly_value = packet.shuft(2);
+                if (debug) data.date_stamp_hex = as_hex(data.date_stamp);
+                if (debug) data.monthly_value_hex = as_hex(data.monthly_value);
+                if (debug) data.half_monthly_value_hex = as_hex(data.half_monthly_value);
                 break;
             case s_packet_type_7:
-                obj.packet_type_name = "SP7";
-                obj.monthly_value_channel0 = packet.shuft(4);
-                obj.half_monthly_value_channel0 = packet.shuft(4);
-                obj.monthly_value_channel1 = packet.shuft(4);
-                obj.half_monthly_value_channel1 = packet.shuft(4);
-                if (debug) obj.monthly_value_channel0_hex = as_hex(obj.monthly_value_channel0);
-                if (debug) obj.half_monthly_value_channel0_hex = as_hex(obj.half_monthly_value_channel0);
-                if (debug) obj.monthly_value_channel1_hex = as_hex(obj.monthly_value_channel1);
-                if (debug) obj.half_monthly_value_channel1_hex = as_hex(obj.half_monthly_value_channel1);
+                data.packet_type_name = "SP7";
+                data.monthly_value_channel0 = packet.shuft(4);
+                data.half_monthly_value_channel0 = packet.shuft(4);
+                data.monthly_value_channel1 = packet.shuft(4);
+                data.half_monthly_value_channel1 = packet.shuft(4);
+                if (debug) data.monthly_value_channel0_hex = as_hex(data.monthly_value_channel0);
+                if (debug) data.half_monthly_value_channel0_hex = as_hex(data.half_monthly_value_channel0);
+                if (debug) data.monthly_value_channel1_hex = as_hex(data.monthly_value_channel1);
+                if (debug) data.half_monthly_value_channel1_hex = as_hex(data.half_monthly_value_channel1);
                 break;
             case s_packet_type_4:
-                obj.packet_type_name = "SP4";
-                obj.date = packet.shuft(2);
-                obj.value = packet.shuft(4);
-                obj.status_summary = packet.shuft(2);
-                obj.reserved = packet.shuft(2);
-                obj.half_monthly_value = packet.shuft(2);
+                data.packet_type_name = "SP4";
+                data.date = packet.shuft(2);
+                data.value = packet.shuft(4);
+                data.status_summary = packet.shuft(2);
+                data.reserved = packet.shuft(2);
+                data.half_monthly_value = packet.shuft(2);
                 // do is da hund drin
-                //obj.date = bytes.slice(1, 3);
-                //obj.value = bytes.slice(3, 7);
-                //obj.status_summary = bytes.slice(7, 9);
-                //obj.reserved = bytes.slice(9, 11);
-                //obj.half_monthly_value = bytes.slice(9, 11);
-                if (debug) obj.date_stamp_hex = as_hex(obj.date_stamp);
-                if (debug) obj.monthly_value_hex = as_hex(obj.monthly_value);
-                if (debug) obj.half_monthly_value_hex = as_hex(obj.half_monthly_value);
+                //data.date = bytes.slice(1, 3);
+                //data.value = bytes.slice(3, 7);
+                //data.status_summary = bytes.slice(7, 9);
+                //data.reserved = bytes.slice(9, 11);
+                //data.half_monthly_value = bytes.slice(9, 11);
+                if (debug) data.date_stamp_hex = as_hex(data.date_stamp);
+                if (debug) data.monthly_value_hex = as_hex(data.monthly_value);
+                if (debug) data.half_monthly_value_hex = as_hex(data.half_monthly_value);
                 break;
             case s_packet_type_8:
-                obj.packet_type_name = "SP8";
-                obj.date = packet.shuft(2);
-                obj.value_channel0 = packet.shuft(4);
-                obj.value_channel1 = packet.shuft(4);
+                data.packet_type_name = "SP8";
+                data.date = packet.shuft(2);
+                data.value_channel0 = packet.shuft(4);
+                data.value_channel1 = packet.shuft(4);
                 break;
             case s_packet_type_9:
-                obj.packet_type_name = "SP9";
-                switch (obj.packet_subtype) {
+                data.packet_type_name = "SP9";
+                switch (data.packet_subtype) {
                     case packet_subtype_0:
                         // schedule: n/a
                         // A SP9 subtype 0x00 packets encodes current date
@@ -129,96 +132,96 @@ function decodeUplink(input) {
                         // Devices will send a SP9 subtype 0x00 packet to
                         // enable the receiver side to check the device clock
                         //  and eventually resynchronize it using a CP packet
-                        obj.packet_subtype_name = "ST0";
-                        obj.time_stamp = packet.shuft(4);
-                        if (debug) obj.time_stamp_hex = as_hex(obj.time_stamp);
+                        data.packet_subtype_name = "ST0";
+                        data.time_stamp = packet.shuft(4);
+                        if (debug) data.time_stamp_hex = as_hex(data.time_stamp);
 // alte conversion aufrufen, eingabetypen vergleichen
                     break;
                     case packet_subtype_1:
                         // Sent every month
                         // except the month of first activation
-                        obj.packet_subtype_name = "ST1";
-                        obj.time_stamp = packet.shuft(4);
-                        obj.status_summary = packet.shuft(2);
-                        if (debug) obj.reserved = packet.shuft(4);
-                        if (debug) obj.time_stamp_hex = as_hex(obj.time_stamp);
-                        obj.time_stamp = date_time_format(obj.time_stamp);
-                        if (debug) obj.status_summary_hex = as_hex(obj.status_summary);
-                        obj.status_summary = sp91_status_summary(obj.status_summary);
-                        if (debug) obj.reserved_hex = as_hex(obj.reserved);
-			const unixTime = Date.parse(obj.time_stamp);
+                        data.packet_subtype_name = "ST1";
+                        data.time_stamp = packet.shuft(4);
+                        data.status_summary = packet.shuft(2);
+                        if (debug) data.reserved = packet.shuft(4);
+                        if (debug) data.time_stamp_hex = as_hex(data.time_stamp);
+                        data.time_stamp = date_time_format(data.time_stamp);
+                        if (debug) data.status_summary_hex = as_hex(data.status_summary);
+                        data.status_summary = sp91_status_summary(data.status_summary);
+                        if (debug) data.reserved_hex = as_hex(data.reserved);
+			const unixTime = Date.parse(data.time_stamp);
 			const now = Date.now();
                         // A negative value means: device time is behind
 			// Functional code 8E - shift time
 			// 
-			obj.time_delta_s = Math.round((unixTime - now) / 1000);
-			if (debug) obj.corrective_payload_hex = as_hex(command_timeshift_payload(obj.time_delta_s));
-			obj.corrective_payload = as_base64(command_timeshift_payload(obj.time_delta_s));
+			data.time_delta_s = Math.round((unixTime - now) / 1000);
+			if (debug) data.corrective_payload_hex = as_hex(command_timeshift_payload(data.time_delta_s));
+			data.corrective_payload = as_base64(command_timeshift_payload(data.time_delta_s));
                     break;
                     case packet_subtype_2:
                         // Sent immediately after first
                         // activation and from then on
                         // every 6 months
-                        obj.packet_subtype_name = "ST2";
+                        data.packet_subtype_name = "ST2";
                         firmware_version = packet.shuft(4);
                         lorawan_version = packet.shuft(3);
                         lora_cmd_version = packet.shuft(2);
                         device_type = packet.shuft(1);
                         meter_id = packet.shuft(4);
                         reserved = packet.shuft(2);
-                        obj.firmware_version = ((firmware_version[0] << 24)
+                        data.firmware_version = ((firmware_version[0] << 24)
                             + (firmware_version[1] << 16)
                             + (firmware_version[2] << 8)
                             + (firmware_version[3])).toString(16).toUpperCase();
-                        obj.lorawan_version = lorawan_version[0].toString(16) +
+                        data.lorawan_version = lorawan_version[0].toString(16) +
                             "." + lorawan_version[1].toString(16) +
                             "." + lorawan_version[2].toString(16);
-                        obj.lora_cmd_version = lora_cmd_version[1].toString(16) +
+                        data.lora_cmd_version = lora_cmd_version[1].toString(16) +
                             "." + lora_cmd_version[0].toString(16);
-                        obj.minol_device_type = device_type.toString(16);
-                        obj.meter_id = ((meter_id[0] << 24)
+                        data.minol_device_type = device_type.toString(16);
+                        data.meter_id = ((meter_id[0] << 24)
                             + (meter_id[1] << 16)
                             + (meter_id[2] << 8)
                             + (meter_id[3])).toString(16).toUpperCase();
                     break;
                     case packet_subtype_3:
-                        obj.packet_subtype_name = "ST3";
+                        data.packet_subtype_name = "ST3";
                     break;
                     default:
-                        obj.packet_subtype_name = "UNIMPLEMENTED";
+                        data.packet_subtype_name = "UNIMPLEMENTED";
                     break;
                 }
                 break;
             case s_packet_type_12:
-                obj.packet_type_name = "SP12";
+                data.packet_type_name = "SP12";
                 break;
             case a_packet_type_1:
-                obj.packet_type_name = "AP1";
-                obj.status_code = packet.shuft(1)
-                obj.status_data = packet.shuft(3)
-                //obj.overhead = packet.shuft(13)
-                if (debug) obj.status_code_hex = as_hex(obj.status_code);
-                if (debug) obj.status_data_hex = as_hex(obj.status_data);
-                var status = ap1_status(obj.status_code, obj.status_data);
-                obj.status_code = status[0];
-                obj.status_data = status[1];
+                data.packet_type_name = "AP1";
+                data.status_code = packet.shuft(1)
+                data.status_data = packet.shuft(3)
+                //data.overhead = packet.shuft(13)
+                if (debug) data.status_code_hex = as_hex(data.status_code);
+                if (debug) data.status_data_hex = as_hex(data.status_data);
+                var status = ap1_status(data.status_code, data.status_data);
+                data.status_code = status[0];
+                data.status_data = status[1];
                 break;
             case a_packet_type_2:
-                obj.packet_type_name = "AP2";
+                data.packet_type_name = "AP2";
                 break;
             case r_packet_type_15:
-                switch (obj.packet_subtype) {
+                switch (data.packet_subtype) {
                     case packet_subtype_14:
-                        obj.packet_type_name = "ANSWER";
-                        obj.packet_subtype_name = "CMD_"+as_hex(packet.shuft(1));
+                        data.packet_type_name = "ANSWER";
+                        data.packet_subtype_name = "CMD_"+as_hex(packet.shuft(1));
                         break;
                     default:
-                        obj.packet_type_name = "UNIMPLEMENTED";
+                        data.packet_type_name = "UNIMPLEMENTED";
                         break;
                 }
                 break;
             default:
-                obj.packet_type_name = "UNIMPLEMENTED";
+                data.packet_type_name = "UNIMPLEMENTED";
                 break;
         }
     }
